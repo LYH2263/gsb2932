@@ -754,6 +754,60 @@ def get_course_study_duration(db: Session, user_id: int, course_id: int):
     ).scalar()
     return result or 0
 
+def get_user_enrollments_with_study_time(db: Session, user_id: int):
+    from sqlalchemy import func
+    enrollments = db.query(models.Enrollment).filter(
+        models.Enrollment.user_id == user_id
+    ).options(joinedload(models.Enrollment.course)).all()
+
+    if not enrollments:
+        return []
+
+    course_ids = [e.course_id for e in enrollments]
+
+    duration_rows = db.query(
+        models.Chapter.course_id,
+        func.coalesce(func.sum(models.LessonProgress.study_duration), 0)
+    ).join(
+        models.Lesson, models.Lesson.chapter_id == models.Chapter.id
+    ).outerjoin(
+        models.LessonProgress,
+        (models.LessonProgress.lesson_id == models.Lesson.id) &
+        (models.LessonProgress.user_id == user_id)
+    ).filter(
+        models.Chapter.course_id.in_(course_ids)
+    ).group_by(
+        models.Chapter.course_id
+    ).all()
+
+    duration_map = {row[0]: int(row[1] or 0) for row in duration_rows}
+
+    result = []
+    for e in enrollments:
+        result.append({
+            "user_id": e.user_id,
+            "course_id": e.course_id,
+            "progress": e.progress,
+            "joined_at": e.joined_at,
+            "last_lesson_id": e.last_lesson_id,
+            "course": {
+                "id": e.course.id,
+                "title": e.course.title,
+                "description": e.course.description,
+                "level": e.course.level,
+                "price": e.course.price,
+                "cover_image": e.course.cover_image,
+                "instructor": e.course.instructor,
+                "rating": e.course.rating,
+                "students_count": e.course.students_count,
+                "is_free": e.course.is_free,
+                "tags": e.course.tags,
+                "chapters": []
+            },
+            "study_duration": duration_map.get(e.course_id, 0)
+        })
+    return result
+
 def get_user_code_snippets(db: Session, user_id: int):
     return db.query(models.CodeSnippet).filter(models.CodeSnippet.user_id == user_id).order_by(models.CodeSnippet.updated_at.desc()).all()
 
