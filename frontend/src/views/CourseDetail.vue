@@ -445,7 +445,7 @@
           <div class="notes-sidebar-header">
             <h4>笔记</h4>
             <el-button size="small" text @click="showNotesSidebar = !showNotesSidebar">
-              <el-icon><Right v-if="!showNotesSidebar" /><Left v-else /></el-icon>
+              <el-icon><Right v-if="!showNotesSidebar" /><ArrowLeft v-else /></el-icon>
             </el-button>
           </div>
           <div v-if="showNotesSidebar" class="notes-sidebar-content">
@@ -485,7 +485,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { User, UserFilled, StarFilled, Star, Document, EditPen, Monitor, Check, Warning, View, ChatDotRound, CreditCard, CircleCheck, CircleClose, Right, Left, Plus, Clock, Discount, WarningFilled, CircleCheckFilled, Present } from '@element-plus/icons-vue'
+import { User, UserFilled, StarFilled, Star, Document, EditPen, Monitor, Check, Warning, View, ChatDotRound, CreditCard, CircleCheck, CircleClose, Right, ArrowLeft, Plus, Clock, Discount, WarningFilled, CircleCheckFilled, Present } from '@element-plus/icons-vue'
 import { getCourse, enrollCourse, purchaseCourse, purchaseCourseWithCoupon, updateProgress, getCourseReviews, createCourseReview, getCourseQuestions, createCourseQuestion, markLessonComplete, getCourseProgress, getCourseDiscount, applyCoupon, claimCoupon } from '../api/course'
 import { getFavorites, addFavorite, removeFavorite } from '../api/user'
 import { executeCode } from '../api/sandbox'

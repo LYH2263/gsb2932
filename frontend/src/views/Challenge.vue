@@ -13,7 +13,7 @@
           <el-empty v-if="challenges.length === 0" description="暂无挑战" />
           <el-menu
             v-else
-            :default-active="activeChallenge ? String(activeChallenge.id) : ''
+            :default-active="activeChallenge ? String(activeChallenge.id) : ''"
             @select="handleSelect"
           >
             <el-menu-item v-for="challenge in challenges" :key="challenge.id" :index="String(challenge.id)">
@@ -146,9 +146,9 @@
                     <div
                       v-for="entry in topThree" :key="entry.id" class="medal-card" :class="'rank-' + entry.rank">
                       <div class="medal-icon">
-                        <el-icon v-if="entry.rank === 1"><FirstPlace /></el-icon>
-                        <el-icon v-else-if="entry.rank === 2"><SecondPlace /></el-icon>
-                        <el-icon v-else><ThirdPlace /></el-icon>
+                        <el-icon v-if="entry.rank === 1"><Trophy /></el-icon>
+                        <el-icon v-else-if="entry.rank === 2"><Medal /></el-icon>
+                        <el-icon v-else><Star /></el-icon>
                       </div>
                       <el-avatar :size="64" :src="entry.author_avatar" />
                       <div class="medal-name">{{ entry.author_name }}</div>
@@ -217,7 +217,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Trophy, Star, FirstPlace, SecondPlace, ThirdPlace } from '@element-plus/icons-vue'
+import { Trophy, Star, Medal } from '@element-plus/icons-vue'
 import { getChallenges, getChallengeDetail, createChallengeSubmission, voteSubmission, getChallengeLeaderboard } from '../api/community'
 import { useAuthStore } from '../stores/auth'
 
@@ -352,7 +352,7 @@ const submitVote = async () => {
 
 const formatDate = (date) => {
   const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 const getDifficultyText = (difficulty) => {

@@ -3,10 +3,10 @@
     <div class="editor-toolbar">
       <el-button-group>
         <el-button size="small" @click="insertBold" title="Ctrl+B 加粗">
-          <el-icon><Bold /></el-icon>
+          <strong>B</strong>
         </el-button>
         <el-button size="small" @click="insertItalic" title="Ctrl+I 斜体">
-          <el-icon><Italic /></el-icon>
+          <em>I</em>
         </el-button>
         <el-button size="small" @click="insertLink" title="Ctrl+K 插入链接">
           <el-icon><Link /></el-icon>
@@ -36,7 +36,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { Bold, Italic, Link } from '@element-plus/icons-vue'
+import { Link } from '@element-plus/icons-vue'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 

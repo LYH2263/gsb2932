@@ -44,7 +44,7 @@
               @click.stop="handlePostLike(post)"
             >
               <el-icon>
-                <component :is="likedPostIds.includes(post.id) ? 'HeartFilled' : 'Heart'" />
+                <component :is="likedPostIds.includes(post.id) ? 'StarFilled' : 'Star'" />
               </el-icon>
               {{ post.likes_count || 0 }}
             </span>
@@ -117,7 +117,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ChatLineSquare, View, Plus, Heart, HeartFilled } from '@element-plus/icons-vue'
+import { ChatLineSquare, View, Plus } from '@element-plus/icons-vue'
 import { getPosts, createPost, getCommentsTree, createComment, likePost, likeComment, getLikeStatus } from '../api/community'
 import CommentItem from '../components/CommentItem.vue'
 import RichTextEditor from '../components/RichTextEditor.vue'

@@ -14,7 +14,7 @@
             @click.stop="handleLike"
           >
             <el-icon>
-              <component :is="isLiked ? 'HeartFilled' : 'Heart'" />
+              <component :is="isLiked ? 'StarFilled' : 'Star'" />
             </el-icon>
             {{ comment.likes_count || 0 }}
           </span>
@@ -74,7 +74,7 @@
 
 <script setup>
 import { ref, computed, defineProps, defineEmits } from 'vue'
-import { Heart, HeartFilled, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 
 const props = defineProps({
   comment: {
