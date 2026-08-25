@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 from passlib.context import CryptContext
 import models, schemas
@@ -736,23 +737,34 @@ def sync_enrollment_progress(db: Session, user_id: int, course_id: int):
     return enrollment
 
 def get_course_study_duration(db: Session, user_id: int, course_id: int):
-    course = db.query(models.Course).filter(models.Course.id == course_id).options(
-        joinedload(models.Course.chapters).joinedload(models.Chapter.lessons)
-    ).first()
-    if not course:
-        return 0
-    lesson_ids = []
-    for chapter in course.chapters:
-        for lesson in chapter.lessons:
-            lesson_ids.append(lesson.id)
-    if not lesson_ids:
-        return 0
-    from sqlalchemy import func
-    result = db.query(func.coalesce(func.sum(models.LessonProgress.study_duration), 0)).filter(
+    result = db.query(func.coalesce(func.sum(models.LessonProgress.study_duration), 0)).join(
+        models.Lesson, models.LessonProgress.lesson_id == models.Lesson.id
+    ).join(
+        models.Chapter, models.Lesson.chapter_id == models.Chapter.id
+    ).filter(
         models.LessonProgress.user_id == user_id,
-        models.LessonProgress.lesson_id.in_(lesson_ids)
+        models.Chapter.course_id == course_id
     ).scalar()
     return result or 0
+
+def get_user_enrollments_with_study_time(db: Session, user_id: int):
+    enrollments = get_user_enrollments(db, user_id)
+    course_ids = [e.course_id for e in enrollments]
+    duration_map = {}
+    if course_ids:
+        rows = db.query(
+            models.Chapter.course_id,
+            func.coalesce(func.sum(models.LessonProgress.study_duration), 0)
+        ).join(
+            models.Lesson, models.Lesson.chapter_id == models.Chapter.id
+        ).join(
+            models.LessonProgress, models.LessonProgress.lesson_id == models.Lesson.id
+        ).filter(
+            models.LessonProgress.user_id == user_id,
+            models.Chapter.course_id.in_(course_ids)
+        ).group_by(models.Chapter.course_id).all()
+        duration_map = {course_id: int(total or 0) for course_id, total in rows}
+    return [(e, duration_map.get(e.course_id, 0)) for e in enrollments]
 
 def get_user_code_snippets(db: Session, user_id: int):
     return db.query(models.CodeSnippet).filter(models.CodeSnippet.user_id == user_id).order_by(models.CodeSnippet.updated_at.desc()).all()

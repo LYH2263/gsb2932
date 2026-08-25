@@ -91,10 +91,9 @@ def get_enrollments_with_time(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    enrollments = crud.get_user_enrollments(db, current_user.id)
+    enrollments_with_time = crud.get_user_enrollments_with_study_time(db, current_user.id)
     result = []
-    for e in enrollments:
-        study_duration = crud.get_course_study_duration(db, current_user.id, e.course_id)
+    for e, study_duration in enrollments_with_time:
         result.append({
             "user_id": e.user_id,
             "course_id": e.course_id,
