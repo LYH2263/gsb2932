@@ -91,33 +91,7 @@ def get_enrollments_with_time(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    enrollments = crud.get_user_enrollments(db, current_user.id)
-    result = []
-    for e in enrollments:
-        study_duration = crud.get_course_study_duration(db, current_user.id, e.course_id)
-        result.append({
-            "user_id": e.user_id,
-            "course_id": e.course_id,
-            "progress": e.progress,
-            "joined_at": e.joined_at,
-            "last_lesson_id": e.last_lesson_id,
-            "course": {
-                "id": e.course.id,
-                "title": e.course.title,
-                "description": e.course.description,
-                "level": e.course.level,
-                "price": e.course.price,
-                "cover_image": e.course.cover_image,
-                "instructor": e.course.instructor,
-                "rating": e.course.rating,
-                "students_count": e.course.students_count,
-                "is_free": e.course.is_free,
-                "tags": e.course.tags,
-                "chapters": []
-            },
-            "study_duration": study_duration
-        })
-    return result
+    return crud.get_user_enrollments_with_study_time(db, current_user.id)
 
 @router.get("/achievements")
 def get_user_achievements(
