@@ -754,6 +754,36 @@ def get_course_study_duration(db: Session, user_id: int, course_id: int):
     ).scalar()
     return result or 0
 
+def get_user_enrollments_with_study_time(db: Session, user_id: int):
+    """返回用户的报名记录，并为每条记录附带该课程各课时 study_duration 之和。
+
+    采用一次 course->chapter->lesson->lesson_progress 的连表聚合查询，避免在路由层
+    逐门课循环调用带来的 N+1 以及 SQLAlchemy identity map 复用导致 chapters/lessons
+    关联集合未被重新加载（进而汇总为 0）的问题。
+    """
+    from sqlalchemy import func
+    enrollments = get_user_enrollments(db, user_id)
+
+    duration_rows = db.query(
+        models.Chapter.course_id,
+        func.coalesce(func.sum(models.LessonProgress.study_duration), 0)
+    ).join(
+        models.Lesson, models.Lesson.chapter_id == models.Chapter.id
+    ).join(
+        models.LessonProgress,
+        (models.LessonProgress.lesson_id == models.Lesson.id) &
+        (models.LessonProgress.user_id == user_id)
+    ).group_by(models.Chapter.course_id).all()
+    duration_map = {course_id: total or 0 for course_id, total in duration_rows}
+
+    result = []
+    for enrollment in enrollments:
+        result.append({
+            "enrollment": enrollment,
+            "study_duration": duration_map.get(enrollment.course_id, 0)
+        })
+    return result
+
 def get_user_code_snippets(db: Session, user_id: int):
     return db.query(models.CodeSnippet).filter(models.CodeSnippet.user_id == user_id).order_by(models.CodeSnippet.updated_at.desc()).all()
 
