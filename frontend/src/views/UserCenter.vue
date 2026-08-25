@@ -519,7 +519,7 @@ import {
   User, Calendar, ChatDotRound, Clock, Medal, Search, MoreFilled, 
   Discount, CircleCheck, Warning, Present, InfoFilled
 } from '@element-plus/icons-vue'
-import { getDashboard, getProjects, getOrders, createProject, deleteProject as deleteProjectAPI, getFavorites, updateUserProfile, getEnrollmentsWithTime, getUserAchievements } from '../api/user'
+import { getDashboard, getProjects, getOrders, createProject, deleteProject as deleteProjectAPI, getFavorites, updateUserProfile, getUserAchievements, getEnrollmentsWithTime } from '../api/user'
 import { getNotes, createNote, updateNote, deleteNote as deleteNoteAPI } from '../api/notes'
 import { getMyCoupons, claimCoupon } from '../api/course'
 import CourseCard from '../components/CourseCard.vue'
